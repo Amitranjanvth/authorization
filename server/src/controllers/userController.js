@@ -1,5 +1,7 @@
 import User from '../../src/models/user.models.js'
 
+//controller for get user data
+
 export const getUserData = async (req,res) => {
 
     const {userId} = req.body;

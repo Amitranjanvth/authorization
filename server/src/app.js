@@ -1,6 +1,8 @@
 import express from 'express';
 import cookieparser from 'cookie-parser';
 import cors from 'cors';
+import {authRouter} from './routes/authRoutes.js'
+
 
 
 const app = express();
@@ -17,6 +19,10 @@ app.use(cookieparser());
 app.get('/', function(req,res){
     res.send("welcome")
 })
+
+
+
+app.use('/api/auth', authRouter);
 
 
 

@@ -1,5 +1,5 @@
 {
-<<<<<<< HEAD
+
   "name": "project2",
   "version": "1.0.0",
   "main": "index.js",
@@ -50,6 +50,6 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.4.0",
     "vite": "^7.1.6"
->>>>>>> a6e27f35296c17ec3d5a8a9ce9f73dc34ba32714
+
   }
 }

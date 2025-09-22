@@ -20,7 +20,7 @@
     "mongoose": "^8.18.1",
     "nodemailer": "^7.0.6",
     "nodemon": "^3.1.10"
-=======
+    
   "name": "authapp",
   "private": true,
   "version": "0.0.0",

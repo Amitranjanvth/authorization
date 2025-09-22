@@ -4,12 +4,12 @@ import cors from 'cors';
 import {authRouter} from './routes/authRoutes.js'
 import userRouter from './routes/userRoutes.js';
 
-
+const allowedOrigin = ['http://localhost:5173']
 
 const app = express();
 
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: allowedOrigin,
     credentials: true
 }));
 app.use(express.json());

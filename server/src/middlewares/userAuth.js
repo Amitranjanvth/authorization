@@ -6,12 +6,16 @@ const userAuth = async(req, res, next) => {
     if(!token){
         return res.json({success:false, message: "tokens not found"});
     }
+   
  
   try {
     const tokenDecode = jwt.verify(token, process.env.JWT_SECRET);
-
+ 
    if(tokenDecode.id){
-    req.body.userId = tokenDecode.id
+    console.log(token)
+    req.user = { id: tokenDecode.id };
+    console.log(req.user)
+    
    }else{
     return res.send("un authorised")
    }

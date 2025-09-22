@@ -2,12 +2,14 @@ import User from '../models/user.models.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import transporter from '../../config/nodemailer.js'
+import {EMAIL_VERIFY_TEMPLATE, PASSWORD_RESET_TEMPLATE} from '../../config/emailTemplate.js'
 
 export const registerUser = async (req, res) => {
     const { username, email, password, fullName } = req.body;
-
+    
     // Validation
     if (!username || !email || !password || !fullName) {
+      
         return res.status(400).json({
             success: false,
             message: "All inputs are required"
@@ -17,9 +19,10 @@ export const registerUser = async (req, res) => {
     try {
         // Check if user already exists
         const existedUser = await User.findOne({
+        
             $or: [{ email }, { username }]
         });
-
+     
         if (existedUser) {
             return res.status(409).json({
                 success: false,
@@ -85,7 +88,7 @@ export const registerUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
     const { email, password } = req.body;
-
+    console.log(req.body)
     // Validation
     if (!email || !password) {
         return res.status(400).json({
@@ -163,9 +166,10 @@ export const logoutUser = async(req,res) => {
 
 export const sendVerifyOtp = async(req, res) => {
     try {
-        const {userId} = req.body;
-        console.log(userId)
+        const userId = req.user.id;
+       //  console.log(userId)
         const user = await User.findById(userId);
+      //  console.log(user)
         if(user.isAccountVerified){
             return res.json({success:false, message: "User already verified"})
         }
@@ -180,20 +184,22 @@ export const sendVerifyOtp = async(req, res) => {
                 from: process.env.SENDER_EMAIL,
                 to: user.email,
                 subject: `Welcome to Auth App`,
-                text: `Your otp is : ${otp}`
+                // text: `Your otp is : ${otp}`
+                html: EMAIL_VERIFY_TEMPLATE.replace("{{otp}}", otp).replace("{{email}}",user.email)
             }
             await transporter.sendMail(mailOptions);
     
            return res.json({success:true, message: "verification otp send to your email"});
     
     } catch (error) {
-         return res.json({success: false, message:"Something went wrong..."});
+         return res.json({success: false, message:"Something went wrong yaa..."});
     }
 
 }
 
 export const verifyEmail = async(req,res) => {
-    const {userId, otp} = req.body;
+    const {otp} = req.body;
+    const userId = req.user.id;
     if(!userId || !otp){
         return res.json({success:false, message: "Something went wrong"});
     }
@@ -252,7 +258,8 @@ export const resetOtp = async(req,res) => {
                 from: process.env.SENDER_EMAIL,
                 to: user.email,
                 subject: `Welcome to Auth App`,
-                text: `Your otp is : ${otp}`
+                // text: `Your otp is : ${otp}`
+                html: PASSWORD_RESET_TEMPLATE.replace("{{otp}}", otp).replace("{{email}}",user.email)
             }
             await transporter.sendMail(mailOptions);
 
@@ -264,15 +271,16 @@ export const resetOtp = async(req,res) => {
 
 export const resetPassword = async(req,res) => {
     const {email, otp, newPassword} = req.body;
-
+   
     if(!email || !otp || !newPassword){
-        res.send("All credentials are Neccessary");
+      return res.send("All credentials are Neccessary");
     }
 
    try {
      const user = await User.findOne({email});
+  
      if(!user){
-         res.json({success: false, message: "User not found.... "})
+        return res.json({success: false, message: "User not found.... "})
      }
  
      if(user.resetOtp === '' || user.resetOtp !== otp){
@@ -282,10 +290,10 @@ export const resetPassword = async(req,res) => {
      if(user.resetOtpExpireAt < Date.now()){
           return res.json({success:false, message: "otp is expired"})
      }
- 
+    console.log(user)
      const hashedPassword = await bcrypt.hash(newPassword,10);
      user.password = hashedPassword,
-     user.resetOtp = " ",
+     user.resetOtp = "",
      user.resetOtpExpireAt = 0,
      await user.save();
  
